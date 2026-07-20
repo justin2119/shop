@@ -16,10 +16,10 @@ class Acceuil extends ConsumerWidget {
     final filter = ref.watch(productFilterProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF263238),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         toolbarHeight: 80,
-        backgroundColor: const Color(0xFF263238),
+        backgroundColor:  Colors.deepOrange,
         foregroundColor: Colors.white,
         elevation: 0,
         title: Text(
@@ -46,13 +46,11 @@ class Acceuil extends ConsumerWidget {
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               onChanged: (value) => ref.read(productFilterProvider.notifier).update((state) => state.copyWith(searchQuery: value)),
-              style: GoogleFonts.abel(color: Colors.white),
+              style: GoogleFonts.abel(color: Colors.black),
               decoration: InputDecoration(
                 hintText: "Rechercher un produit...",
-                hintStyle: GoogleFonts.abel(color: Colors.white54),
-                prefixIcon: const Icon(Icons.search, color: Colors.white54),
-                filled: true,
-                fillColor: Colors.white10,
+                hintStyle: GoogleFonts.abel(color: Colors.black),
+                prefixIcon: const Icon(Icons.search, color: Colors.black),
                 border: const OutlineInputBorder(
                   borderRadius: BorderRadius.zero,
                   borderSide: BorderSide.none,
@@ -67,7 +65,7 @@ class Acceuil extends ConsumerWidget {
                 children: [
                   Chip(
                     label: Text(filter.category, style: GoogleFonts.abel(color: const Color(0xFF263238))),
-                    backgroundColor: Colors.white,
+                    backgroundColor: Colors.deepOrange,
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                     onDeleted: () => ref.read(productFilterProvider.notifier).update((state) => state.copyWith(category: 'Tous')),
                     deleteIconColor: const Color(0xFF263238),
@@ -93,7 +91,7 @@ class Acceuil extends ConsumerWidget {
                         title: Text(
                           product.title,
                           style: GoogleFonts.abel(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -102,16 +100,16 @@ class Acceuil extends ConsumerWidget {
                         ),
                         subtitle: Text(
                           product.description,
-                          style: GoogleFonts.abel(color: Colors.white70),
+                          style: GoogleFonts.abel(color: Colors.black54),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                         trailing: Text(
                           "${product.price.toString()} CFA",
                           style: GoogleFonts.abel(
-                            fontSize: 16,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.deepOrange,
                           ),
                         ),
                       );
@@ -133,7 +131,7 @@ class Acceuil extends ConsumerWidget {
     
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF263238),
+      backgroundColor:Colors.deepOrange,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder: (context) {
         return Container(
@@ -143,7 +141,7 @@ class Acceuil extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "TRIER PAR",
+                "Trier par",
                 style: GoogleFonts.abel(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 1.2),
               ),
               const SizedBox(height: 16),
@@ -177,7 +175,11 @@ class Acceuil extends ConsumerWidget {
   Widget _buildSortOption(WidgetRef ref, String label, ProductSortType type) {
     final currentType = ref.watch(productFilterProvider).sortType;
     return ListTile(
-      title: Text(label, style: GoogleFonts.abel(color: Colors.white)),
+      title: Text(label,
+          style: GoogleFonts.abel(color: Colors.white,
+            fontSize: 22
+          )
+      ),
       trailing: currentType == type ? const Icon(Icons.check, color: Colors.white) : null,
       contentPadding: EdgeInsets.zero,
       onTap: () {
@@ -191,7 +193,11 @@ class Acceuil extends ConsumerWidget {
     final currentCategory = ref.watch(productFilterProvider).category;
     final isSelected = currentCategory == category;
     return ChoiceChip(
-      label: Text(category, style: GoogleFonts.abel(color: isSelected ? const Color(0xFF263238) : Colors.white)),
+      label: Text(category,
+          style: GoogleFonts.abel(color: isSelected ?
+          Colors.deepOrange : Colors.black,
+            fontSize:16
+          )),
       selected: isSelected,
       selectedColor: Colors.white,
       backgroundColor: Colors.white10,
