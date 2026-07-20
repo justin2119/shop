@@ -15,7 +15,13 @@ class PanierCard extends ConsumerWidget {
         centerTitle: true,
         foregroundColor: Colors.white,
         backgroundColor: Colors.deepOrange,
-        title: Text("Panier",),
+        title: Text("Panier ($itemCount)",),
+        actions: [
+          IconButton(onPressed: (){
+            ref.read(PanierProvider.notifier).Clear();
+          }, icon: Icon(Icons.delete)
+          )
+        ],
       ),
       body: Column(
         children: [
@@ -23,7 +29,7 @@ class PanierCard extends ConsumerWidget {
           Expanded(
             child: ListView.separated(
                 itemBuilder: (context, index){
-                  final product=cart[index];
+                  final product=cart[index].product;
                   return ListTile(
                     leading: SizedBox(
                       width: 100,
@@ -38,16 +44,20 @@ class PanierCard extends ConsumerWidget {
                       children:[
                         Text("${product.price.toString()} CFA",),
                         IconButton(onPressed: (){
-                          ref.read(PanierProvider.notifier).RemoveCard(product);
+                          ref.read(PanierProvider.notifier).Remove(product);
                         }, icon: Icon(Icons.delete))
                       ]
                     ),
                     trailing:Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(onPressed: (){}, icon:Icon(Icons.remove_circle)),
-                        Text("1"),
-                        IconButton(onPressed: (){}, icon:Icon(Icons.add_circle)),
+                        IconButton(onPressed: (){
+                          ref.read(PanierProvider.notifier).RemoveProduct(product);
+                        }, icon:Icon(Icons.remove_circle)),
+                        Text(cart[index].quantity.toString()),
+                        IconButton(onPressed: (){
+                          ref.read(PanierProvider.notifier).AddProduct(product);
+                        }, icon:Icon(Icons.add_circle)),
                       ]
                     )
                   );
@@ -60,13 +70,34 @@ class PanierCard extends ConsumerWidget {
       ),
       bottomNavigationBar: BottomAppBar(
         color: Colors.deepOrange,
-        child: Expanded(
-          child: Text("Total : ",
-            style: TextStyle(
-              fontSize: 25,
-              color: Colors.white
+        child: Row(
+          children: [
+            Expanded(
+              child: Text("Total : ${ref.watch(PanierProvider.notifier).TotalPrice.toString()} CFA",
+                style: TextStyle(
+                  fontSize: 25,
+                  color: Colors.white
+                )
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                padding: EdgeInsets.all(10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)
+                ),
+                elevation:5
+              ),
+              child: Text("Payer",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.deepOrange
+                )
+              )
             )
-          ),
+          ],
         )
       ),
     );
