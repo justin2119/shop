@@ -1,35 +1,68 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop_app/domain/models/product_model.dart';
 
-class FavoriteNotifier extends Notifier<List<ProductModel>>{
+class FavoriteNotifier extends Notifier<List<ProductModel>> {
   @override
   List<ProductModel> build() {
+    _loadFavorites();
     return [];
   }
 
-  void ToggleFavorite(ProductModel product){
-    if(isFavorite(product)){
+  Future<void> _loadFavorites() async {
+    final favorites = await _getFavorite();
+    state = favorites;
+  }
+
+  void ToggleFavorite(ProductModel product) {
+    if (isFavorite(product)) {
       RemoveFavorite(product);
-    }else{
+    } else {
       AddFavorite(product);
     }
   }
-  void AddFavorite(ProductModel product){
-    state=[...state,product];
-  }
-  void RemoveFavorite(ProductModel product){
-    state=state.where((element) => element.id!=product.id).toList();
-  }
-  bool isFavorite(ProductModel product){
-    return state.any((element) => element.id==product.id);
-  }
-  void ClearFavorite(){
-    state=[];
+
+  Future<void> AddFavorite(ProductModel product) async {
+    state = [...state, product];
+    await _saveProduct(state);
   }
 
+  Future<void> RemoveFavorite(ProductModel product) async {
+    state = state.where((element) => element.id != product.id).toList();
+    await _saveProduct(state);
+  }
+
+  bool isFavorite(ProductModel product) {
+    return state.any((element) => element.id == product.id);
+  }
+
+  Future<void> ClearFavorite() async {
+    state = [];
+    await _saveProduct(state);
+  }
+
+  Future<void> _saveProduct(List<ProductModel> favorites) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final json = jsonEncode(
+      favorites.map((e) => e.toJson()).toList(),
+    );
+    await prefs.setString("favoritekey", json);
+  }
+
+  Future<List<ProductModel>> _getFavorite() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString("favoritekey");
+    if (jsonString == null) {
+      return [];
+    }
+    final List<dynamic> decoded = jsonDecode(jsonString);
+    return decoded
+        .map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
 }
 
-final FavoriteProvider=NotifierProvider<FavoriteNotifier,List<ProductModel>>(FavoriteNotifier.new);
+final FavoriteProvider = NotifierProvider<FavoriteNotifier, List<ProductModel>>(FavoriteNotifier.new);
